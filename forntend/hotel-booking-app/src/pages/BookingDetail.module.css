@@ -1,0 +1,202 @@
+/* .container - จัดการคอนเทนเนอร์ */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5; /* เปลี่ยนพื้นหลังให้ดูสะอาด */
+  min-height: 100vh;
+}
+
+/* .bookingCard - การ์ดรายละเอียดการจอง */
+.bookingCard {
+  background-color: white;
+  border-radius: 12px; /* เพิ่มมุมโค้งที่ใหญ่ขึ้น */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* เพิ่มความคมชัดของเงา */
+  padding: 30px;
+  max-width: 900px; /* ขยายขนาดสูงสุดของการ์ด */
+  width: 100%;
+  margin: 20px;
+}
+
+/* .title - หัวข้อ */
+.title {
+  text-align: center;
+  color: #333;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* .hotelInfo - ข้อมูลโรงแรม */
+.hotelInfo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 20px;
+}
+
+.hotelImage {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
+.hotelDetails {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+/* .bookingDetails - รายละเอียดการจอง */
+.bookingDetails {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* ใช้ Grid Layout เพื่อจัดข้อมูลในสองคอลัมน์ */
+  gap: 20px;
+}
+
+.bookingDetails label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.bookingDetails input {
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  color: #333;
+  width: 100%;
+}
+
+.bookingDetails p {
+  font-size: 14px;
+  color: #555;
+  margin: 5px 0;
+}
+
+/* .buttonGroup - กลุ่มปุ่ม */
+.buttonGroup {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btnEdit, .btnDelete, .btnSave, .btnCancel {
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 120px;
+  transition: background-color 0.3s ease;
+}
+
+/* ปุ่ม Edit */
+.btnEdit {
+  background-color: #f6c90e; /* เปลี่ยนเป็นสีเหลือง */
+  color: #fff; /* ข้อความสีขาว */
+}
+
+.btnEdit:hover {
+  background-color: #f4b700; /* สีเหลืองอ่อนลงเล็กน้อยเมื่อ hover */
+}
+/* ปุ่ม Delete */
+.btnDelete {
+  background-color: #e53935;
+}
+
+.btnDelete:hover {
+  background-color: #d32f2f;
+}
+
+/* ปุ่ม Save */
+.btnSave {
+  background-color: #388e3c;
+}
+
+.btnSave:hover {
+  background-color: #2c6b2f;
+}
+
+/* ปุ่ม Cancel */
+.btnCancel {
+  background-color: #616161;
+}
+
+.btnCancel:hover {
+  background-color: #424242;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 12px; /* ลดระยะห่างระหว่างปุ่ม */
+  justify-content: center;
+  margin-top: 20px;
+}
+.btnEdit, .btnDelete, .btnSave, .btnCancel {
+  padding: 8px 16px; /* ปรับให้ปุ่มเล็กลง */
+  font-size: 0.9rem; /* ลดขนาดฟอนต์ */
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100px;
+  transition: background-color 0.3s ease;
+}
+/* Responsive สำหรับหน้าจอที่มีขนาดเล็กกว่า 768px */
+@media screen and (max-width: 768px) {
+  .hotelInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hotelImage {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  .bookingCard {
+    margin: 15px;
+    padding: 20px;
+  }
+
+  .bookingDetails {
+    grid-template-columns: 1fr; /* เปลี่ยนเป็นคอลัมน์เดียว */
+  }
+
+  .btnEdit, .btnDelete, .btnSave, .btnCancel {
+    width: 100%;
+  }
+}
+
+/* Responsive สำหรับมือถือ (ขนาดหน้าจอ 480px) */
+@media screen and (max-width: 480px) {
+  .title {
+    font-size: 1.6rem; /* ขนาดฟอนต์ของหัวข้อบนมือถือ */
+  }
+
+  .bookingDetails {
+    grid-template-columns: 1fr; /* ลดลงให้เป็นคอลัมน์เดียวบนมือถือ */
+  }
+
+  .btnEdit, .btnDelete, .btnSave, .btnCancel {
+    width: 100%; /* ทำให้ปุ่มกว้างเต็มที่ */
+    padding: 12px 0;
+  }
+}

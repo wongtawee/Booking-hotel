@@ -1,0 +1,76 @@
+/* index.css */
+@import "../node_modules/slick-carousel/slick/slick.css";
+@import "../node_modules/slick-carousel/slick/slick-theme.css";
+
+:root {
+  /* ฟอนต์หลัก */
+  font-family: 'Prompt', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* ธีมสีเหลืองอ่อน */
+  --primary-color: #f6c90e;
+  --primary-light: #fceea7;
+  --background-color: #fffef9;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  color: var(--text-primary);
+  background-color: var(--background-color);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: 'Prompt', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+}
+
+/* ลิงก์ */
+a {
+  font-weight: 500;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #e0b700;
+}
+
+/* หัวข้อ */
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+/* ปุ่ม */
+button {
+  border-radius: 8px;
+  border: none;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--primary-color);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #e0b700;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}

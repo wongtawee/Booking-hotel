@@ -1,0 +1,129 @@
+.wrapper {
+  background-color: #fffef9;
+  padding: 40px 20px;
+  min-height: 100vh;
+ 
+}
+
+.container {
+  
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+
+  box-shadow: 0 12px 24px -6px rgba(246, 201, 14, 0.2), 
+              0 4px 8px rgba(0, 0, 0, 0.05);
+
+  padding: 40px 35px;
+}
+
+.title {
+  font-size: 1.7rem;
+  color: #333333;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.errorMessage {
+  color: #e74c3c;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.successMessage {
+  color: #4CAF50;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.label {
+  font-weight: 600;
+  color: #333333;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  margin-top: 6px;    
+  padding: 10px 12px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1.5px solid #fceea7;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  border-color: #f6c90e;
+  box-shadow: 0 0 5px #f6c90e88;
+}
+
+.saveButton {
+background-color: #f6c90e; /* เปลี่ยนเป็นสีเหลือง */
+  color: #fff; /* ข้อความสีขาว */
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(246, 201, 14, 0.5);
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background-color: #e0b700;
+}
+
+@media screen and (max-width: 600px) {
+  .wrapper {
+    padding: 20px 10px;
+  }
+
+  .container {
+    padding: 20px 16px;
+    box-shadow: 0 4px 12px rgba(246, 201, 14, 0.2);
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .input {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .saveButton {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .errorMessage,
+  .successMessage {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+}

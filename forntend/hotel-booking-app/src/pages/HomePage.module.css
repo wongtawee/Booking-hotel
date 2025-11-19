@@ -1,0 +1,57 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  background-color: #f4f4f9;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* grid รายการโรงแรม */
+.hotelList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+}
+
+/* Responsive: ลดขนาด font header และ grid gap */
+@media screen and (max-width: 768px) {
+  .header {
+    font-size: 1.6rem;
+  }
+
+  .hotelList {
+    gap: 15px;
+    max-width: 90%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header {
+    font-size: 1.4rem;
+  }
+
+  .hotelList {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 20px;
+  }
+}

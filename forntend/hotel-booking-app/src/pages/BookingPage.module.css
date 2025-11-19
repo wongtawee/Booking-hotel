@@ -1,0 +1,180 @@
+.pageWrapper {
+  padding: 40px 20px;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.leftCol {
+  flex: 1 1 50%;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.rightCol {
+  flex: 1 1 50%;
+  padding: 30px;
+  background-color: #fdfaf3;
+  box-sizing: border-box;
+}
+
+.heading {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.inputHalf {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.dateRow {
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f6c90e;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #e0b700;
+}
+
+.image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.hotelName {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.location {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.priceBox {
+  background-color: #fffbe6;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #f6c90e;
+  margin-top: 20px;
+  font-size: 1rem;
+  color: #444;
+}
+
+.priceTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #d98000;
+  margin-bottom: 12px;
+}
+
+.hr {
+  margin: 10px 0;
+  border-top: 1px solid #ddd;
+  border-style: solid none none none;
+  border-width: 1px;
+}
+
+.totalLabel {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+.totalPrice {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e85d04;
+}
+
+.note {
+  font-size: 0.85rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .leftCol, .rightCol {
+    flex: 1 1 100%;
+    padding: 20px;
+  }
+  .image {
+    height: 200px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heading {
+    font-size: 1.3rem;
+  }
+  .button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+  .input, .inputHalf {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+  .hotelName {
+    font-size: 1.1rem;
+  }
+  .location {
+    font-size: 0.9rem;
+  }
+  .priceBox {
+    font-size: 0.9rem;
+  }
+  .totalPrice {
+    font-size: 1.3rem;
+  }
+}
