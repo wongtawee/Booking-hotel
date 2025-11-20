@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import mockHotels from '../data/mockHotels';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { getHotelById } from '../services/hotelService';
+import { getRoomsByHotel, checkAvailability } from '../services/roomService';
+import { createBooking } from '../services/bookingService';
 import styles from "./BookingPage.module.css";
 
 const BookingPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const hotel = mockHotels.find((h) => h.id === id);
+    const [searchParams] = useSearchParams();
+    const roomIdFromUrl = searchParams.get('roomId');
+
+    const [hotel, setHotel] = useState(null);
+    const [rooms, setRooms] = useState([]);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [, setError] = useState(null);
 
     const [form, setForm] = useState({
         name: '',
@@ -20,28 +29,51 @@ const BookingPage = () => {
     const [nights, setNights] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
 
-useEffect(() => {
-    console.log('Check-in:', form.checkIn);
-    console.log('Check-out:', form.checkOut);
-    console.log('Hotel:', hotel);
+    // Fetch hotel and rooms
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const hotelResponse = await getHotelById(id);
+                setHotel(hotelResponse.data);
 
-    const inDate = new Date(form.checkIn);
-    const outDate = new Date(form.checkOut);
+                const roomsResponse = await getRoomsByHotel(id);
+                setRooms(roomsResponse.data);
 
-    if (!isNaN(inDate) && !isNaN(outDate)) {
-        const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
-        const calculatedNights = diff > 0 ? diff : 0;
-        setNights(calculatedNights);
+                // Pre-select room if roomId in URL
+                if (roomIdFromUrl) {
+                    const room = roomsResponse.data.find(r => r._id === roomIdFromUrl);
+                    if (room) setSelectedRoom(room);
+                }
+            } catch (err) {
+                setError(err.message || 'Failed to load data');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        const price = hotel?.price ? hotel.price * calculatedNights : 0;
-        setTotalPrice(price);
-        console.log('Nights:', calculatedNights);
-        console.log('Total Price:', price);
-    } else {
-        setNights(0);
-        setTotalPrice(0);
-    }
-}, [form.checkIn, form.checkOut, hotel]);
+        fetchData();
+    }, [id, roomIdFromUrl]);
+
+// Calculate nights and total price
+    useEffect(() => {
+        const inDate = new Date(form.checkIn);
+        const outDate = new Date(form.checkOut);
+
+        if (!isNaN(inDate) && !isNaN(outDate)) {
+            const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
+            const calculatedNights = diff > 0 ? diff : 0;
+            setNights(calculatedNights);
+
+            const price = selectedRoom?.pricePerNight 
+                ? selectedRoom.pricePerNight * calculatedNights 
+                : 0;
+            setTotalPrice(price);
+        } else {
+            setNights(0);
+            setTotalPrice(0);
+        }
+    }, [form.checkIn, form.checkOut, selectedRoom]);
 
 
 const handleChange = (e) => {
@@ -58,58 +90,70 @@ const handleChange = (e) => {
 
 
 const handleSubmit = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (nights <= 0) {
-        alert('กรุณาเลือกวันที่เช็คอินและเช็คเอาท์');
-        return;
-    }
-
-    const bookingData = {
-        ...form,
-        hotelId: hotel.id,
-        totalPrice,
-    };
-const token = localStorage.getItem('token');
-    try {
-        const res = await fetch('http://localhost:5000/api/bookings', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(bookingData),
-        });
-
-        const savedBooking = await res.json();
-
-        if (res.ok) {
-            alert('✅ การจองสำเร็จแล้ว!');
-navigate('/payment', {
-  state: {
-    bookingId: savedBooking._id,
-    amount: savedBooking.totalPrice,
-    hotelName: hotel.name,
-     hotelImage: hotel.images[0],
-    checkIn: savedBooking.checkIn,
-    checkOut: savedBooking.checkOut,
-    guests: savedBooking.guests,
-    nights,
-    pricePerNight: hotel.price,
-  }
-});
-
-        } else {
-            alert('❌ เกิดข้อผิดพลาดในการบันทึกการจอง');
+        if (!selectedRoom) {
+            alert('กรุณาเลือกห้องพัก');
+            return;
         }
-    } catch (err) {
-        console.error(err);
-        alert('❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-    }
-};
 
+        if (nights <= 0) {
+            alert('กรุณาเลือกวันที่เช็คอินและเช็คเอาท์');
+            return;
+        }
+
+        try {
+            // Check room availability
+            const availabilityResponse = await checkAvailability(
+                selectedRoom._id,
+                form.checkIn,
+                form.checkOut
+            );
+
+            if (!availabilityResponse.data.available) {
+                alert('ห้องนี้ไม่ว่างในช่วงวันที่เลือก กรุณาเลือกห้องอื่นหรือวันที่อื่น');
+                return;
+            }
+
+            // Create booking
+            const bookingData = {
+                ...form,
+                hotelId: hotel._id,
+                roomId: selectedRoom._id,
+                totalPrice,
+            };
+
+            const response = await createBooking(bookingData);
+
+            if (response.success) {
+                alert('✅ การจองสำเร็จแล้ว!');
+                navigate('/payment', {
+                    state: {
+                        bookingId: response.data._id,
+                        amount: response.data.totalPrice,
+                        hotelName: hotel.name,
+                        hotelImage: hotel.images[0],
+                        roomType: selectedRoom.roomType,
+                        checkIn: response.data.checkIn,
+                        checkOut: response.data.checkOut,
+                        guests: response.data.guests,
+                        nights,
+                        pricePerNight: selectedRoom.pricePerNight,
+                    }
+                });
+            }
+        } catch (err) {
+            alert(`❌ ${err.message || 'เกิดข้อผิดพลาดในการจอง'}`);
+        }
+    };
+
+
+    if (loading) {
+        return <div style={{ padding: '40px', textAlign: 'center' }}><h2>กำลังโหลด...</h2></div>;
+    }
 
     if (!hotel) {
-        return <div style={styles.centered}><h2>ไม่พบโรงแรม</h2></div>;
+        return <div style={{ padding: '40px', textAlign: 'center' }}><h2>ไม่พบโรงแรม</h2></div>;
     }
 
     return (
@@ -117,6 +161,28 @@ navigate('/payment', {
       <div className={styles.container}>
         <div className={styles.leftCol}>
           <h2 className={styles.heading}>จองโรงแรม</h2>
+          
+          {/* Room Selection */}
+          <div className={styles.roomSelection}>
+            <label className={styles.label}>เลือกห้องพัก</label>
+            <select
+              value={selectedRoom?._id || ''}
+              onChange={(e) => {
+                const room = rooms.find(r => r._id === e.target.value);
+                setSelectedRoom(room);
+              }}
+              className={styles.select}
+              required
+            >
+              <option value="">-- เลือกห้องพัก --</option>
+              {rooms.map(room => (
+                <option key={room._id} value={room._id}>
+                  {room.roomType} - {room.pricePerNight.toLocaleString()} บาท/คืน (จำนวนผู้เข้าพัก: {room.capacity})
+                </option>
+              ))}
+            </select>
+          </div>
+
           <form onSubmit={handleSubmit} className={styles.form}>
             <input
               type="text"
@@ -174,8 +240,8 @@ navigate('/payment', {
               onChange={handleChange}
               className={styles.input}
             />
-            <button type="submit" className={styles.button}>
-              ดำเนินการชำระเงิน
+            <button type="submit" className={styles.button} disabled={!selectedRoom}>
+              {selectedRoom ? '💳 ดำเนินการชำระเงิน' : '⚠️ กรุณาเลือกห้องพัก'}
             </button>
           </form>
         </div>
@@ -185,13 +251,20 @@ navigate('/payment', {
           <h3 className={styles.hotelName}>{hotel.name}</h3>
           <p className={styles.location}>{hotel.location}</p>
 
-          {form.checkIn && form.checkOut && (
+          {selectedRoom && (
+            <div className={styles.roomInfo}>
+              <h4>ห้องที่เลือก: {selectedRoom.roomType}</h4>
+              <p>ราคา: {selectedRoom.pricePerNight.toLocaleString()} บาท/คืน</p>
+            </div>
+          )}
+
+          {form.checkIn && form.checkOut && selectedRoom && (
             <div className={styles.priceBox}>
               <h4 className={styles.priceTitle}>สรุปค่าบริการ</h4>
               <p><strong>เช็คอิน:</strong> {form.checkIn}</p>
               <p><strong>เช็คเอาท์:</strong> {form.checkOut}</p>
               <p><strong>จำนวนคืน:</strong> {nights} คืน</p>
-              <p><strong>ราคาต่อคืน:</strong> {hotel.price.toLocaleString()} บาท</p>
+              <p><strong>ราคาต่อคืน:</strong> {selectedRoom.pricePerNight.toLocaleString()} บาท</p>
               <hr className={styles.hr} />
               <p className={styles.totalLabel}>รวมทั้งหมด</p>
               <p className={styles.totalPrice}>{totalPrice.toLocaleString()} บาท</p>

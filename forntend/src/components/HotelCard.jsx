@@ -1,90 +1,264 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const HotelCard = ({ hotel }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
-        <div style={styles.card}>
-            {/* แสดงแค่ภาพแรกจากอาร์เรย์ images */}
-            <img src={hotel.images[0]} alt={hotel.name} style={styles.image} />
-            <div style={styles.content}>
-                <h2 style={styles.title}>{hotel.name}</h2>
-                <p style={styles.location}>{hotel.location}</p>
-                <p>⭐ {hotel.rating} | ฿{hotel.price}/คืน</p>
-                <p style={styles.description}>{hotel.description}</p>
-                
-                {/* ปุ่มดูรายละเอียด */}
-                <div style={styles.buttonContainer}>
-                    <Link to={`/hotel/${hotel.id}`} style={styles.button}>
-                        ดูรายละเอียด
-                    </Link>
+        <Link 
+            to={`/hotel/${hotel._id || hotel.id}`} 
+            style={{
+                ...styles.card,
+                ...(isHovered ? styles.cardHover : {})
+            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <div style={styles.imageContainer}>
+                {!imageLoaded && (
+                    <div style={styles.imagePlaceholder}>
+                        <span style={styles.loadingIcon}>🏨</span>
+                    </div>
+                )}
+                <img 
+                    src={hotel.images?.[0] || '/placeholder-hotel.jpg'} 
+                    alt={hotel.name} 
+                    style={{
+                        ...styles.image,
+                        ...(imageLoaded ? styles.imageLoaded : styles.imageHidden)
+                    }}
+                    onLoad={() => setImageLoaded(true)}
+                />
+                <div style={styles.ratingBadge}>
+                    <span style={styles.star}>⭐</span>
+                    <span style={styles.ratingText}>{hotel.rating || '0.0'}</span>
                 </div>
             </div>
-        </div>
+            
+            <div style={styles.content}>
+                <h3 style={styles.title}>{hotel.name}</h3>
+                <p style={styles.location}>
+                    <span style={styles.locationIcon}>📍</span>
+                    {hotel.location}
+                </p>
+                
+                <p style={styles.description}>
+                    {hotel.description?.length > 80 
+                        ? `${hotel.description.substring(0, 80)}...` 
+                        : hotel.description}
+                </p>
+
+                {hotel.amenities && hotel.amenities.length > 0 && (
+                    <div style={styles.amenities}>
+                        {hotel.amenities.slice(0, 3).map((amenity, index) => (
+                            <span key={index} style={styles.amenityTag}>
+                                {amenity}
+                            </span>
+                        ))}
+                        {hotel.amenities.length > 3 && (
+                            <span style={styles.amenityMore}>
+                                +{hotel.amenities.length - 3}
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                <div style={styles.footer}>
+                    <div style={styles.priceSection}>
+                        <span style={styles.priceLabel}>ราคาเริ่มต้น</span>
+                        <div style={styles.priceContainer}>
+                            <span style={styles.price}>
+                                ฿1,000
+                            </span>
+                            <span style={styles.priceUnit}>/คืน</span>
+                        </div>
+                    </div>
+                    <button style={styles.button}>
+                        ดูรายละเอียด →
+                    </button>
+                </div>
+            </div>
+        </Link>
     );
 };
 
 const styles = {
     card: {
-        backgroundColor: '#fffef9',
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
         overflow: 'hidden',
-        transition: 'transform 0.3s ease-in-out',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         cursor: 'pointer',
-        margin: '30px',
-        width: '280px', // กำหนดขนาดการ์ด
         display: 'flex',
-        flexDirection: 'column', // ใช้ flex เพื่อให้การจัดตำแหน่งเรียงในแนวตั้ง
-        justifyContent: 'space-between', // จัดเนื้อหาต่างๆ ให้มีระยะห่างเท่ากัน
-
-
+        flexDirection: 'column',
+        textDecoration: 'none',
+        color: 'inherit',
+        height: '100%',
+    },
+    cardHover: {
+        transform: 'translateY(-8px)',
+        boxShadow: '0 12px 40px rgba(102, 126, 234, 0.2)',
+    },
+    imageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: 240,
+        overflow: 'hidden',
+        backgroundColor: '#f7fafc',
+    },
+    imagePlaceholder: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    },
+    loadingIcon: {
+        fontSize: 48,
+        opacity: 0.5,
     },
     image: {
         width: '100%',
-        height: '200px',
+        height: '100%',
         objectFit: 'cover',
-        borderBottom: '2px solid #fceea7',
+        transition: 'transform 0.3s ease',
+    },
+    imageHidden: {
+        opacity: 0,
+    },
+    imageLoaded: {
+        opacity: 1,
+    },
+    ratingBadge: {
+        position: 'absolute',
+        top: 16,
+        right: 16,
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        padding: '8px 12px',
+        borderRadius: 20,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    },
+    star: {
+        fontSize: 16,
+    },
+    ratingText: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#2d3748',
     },
     content: {
-        padding: '16px',
+        padding: 20,
         display: 'flex',
-        flexDirection: 'column',  // ใช้ flex ให้ทุกอย่างเรียงในแนวตั้ง
-        flexGrow: 1,  // ทำให้เนื้อหาค่อยๆ เติบโตในกรณีที่มีเนื้อหายาว
+        flexDirection: 'column',
+        flexGrow: 1,
     },
     title: {
-        fontSize: '1.3rem',
+        fontSize: 20,
         fontWeight: '700',
-        marginBottom: '8px',
-        color: '#333',
+        marginBottom: 8,
+        color: '#2d3748',
+        lineHeight: 1.3,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
     },
     location: {
-        color: '#888',
-        marginBottom: '4px',
-        fontSize: '0.95rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        color: '#718096',
+        marginBottom: 12,
+        fontSize: 14,
+    },
+    locationIcon: {
+        fontSize: 14,
     },
     description: {
-        fontSize: '0.9rem',
-        color: '#666',
-        marginBottom: '12px',
-        flexGrow: 1,  // ทำให้พื้นที่สำหรับคำอธิบายเติบโตและไม่บีบเนื้อหาด้านล่าง
+        fontSize: 14,
+        color: '#4a5568',
+        lineHeight: 1.6,
+        marginBottom: 16,
+        flexGrow: 1,
     },
-    buttonContainer: {
+    amenities: {
         display: 'flex',
-        justifyContent: 'center',  // จัดปุ่มให้ตรงกลาง
-        marginTop: 'auto',  // ใช้ margin-top:auto เพื่อให้ปุ่มอยู่ด้านล่างสุด
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 16,
+    },
+    amenityTag: {
+        fontSize: 12,
+        padding: '4px 10px',
+        background: '#edf2f7',
+        color: '#4a5568',
+        borderRadius: 12,
+        fontWeight: 500,
+    },
+    amenityMore: {
+        fontSize: 12,
+        padding: '4px 10px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: '#fff',
+        borderRadius: 12,
+        fontWeight: 600,
+    },
+    footer: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 16,
+        borderTop: '1px solid #e2e8f0',
+        marginTop: 'auto',
+    },
+    priceSection: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+    },
+    priceLabel: {
+        fontSize: 12,
+        color: '#718096',
+        fontWeight: 500,
+    },
+    priceContainer: {
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: 4,
+    },
+    price: {
+        fontSize: 24,
+        fontWeight: '800',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+    },
+    priceUnit: {
+        fontSize: 14,
+        color: '#718096',
+        fontWeight: 500,
     },
     button: {
-        padding: '8px 16px',
-        backgroundColor: '#f6c90e',
+        padding: '10px 20px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: '#fff',
-        textDecoration: 'none',
         border: 'none',
-        borderRadius: '6px',
-        fontWeight: '600',
-        fontSize: '0.95rem',
-        transition: 'background-color 0.3s ease',
-        display: 'inline-block',
-        textAlign: 'center',
+        borderRadius: 8,
+        fontSize: 14,
+        fontWeight: 600,
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
     },
 };
 
