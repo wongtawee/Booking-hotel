@@ -24,8 +24,18 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [scrolled, setScrolled] = useState(false);
+  const [profileImage, setProfileImage] = useState(localStorage.getItem('profileImage') || '');
   
   const profileRef = useRef(null);
+
+  // Listen for profile updates
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      setProfileImage(localStorage.getItem('profileImage') || '');
+    };
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
@@ -60,8 +70,18 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("profileImage");
     setProfileOpen(false);
     navigate("/login");
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   };
 
   const isActive = (path) => location.pathname === path;
@@ -134,7 +154,15 @@ const Navbar = () => {
                 style={styles.profileButton}
               >
                 <div style={styles.avatar}>
-                  {user?.name ? user.name.charAt(0).toUpperCase() : '👤'}
+                  {profileImage ? (
+                    <img 
+                      src={profileImage} 
+                      alt="Profile" 
+                      style={styles.avatarImage}
+                    />
+                  ) : (
+                    getInitials(user?.name || '')
+                  )}
                 </div>
                 <span style={styles.profileName}>{user?.name || 'User'}</span>
                 <span style={styles.dropdownArrow}>▼</span>
@@ -144,7 +172,15 @@ const Navbar = () => {
                 <div style={styles.dropdown}>
                   <div style={styles.dropdownHeader}>
                     <div style={styles.avatarLarge}>
-                      {user?.name ? user.name.charAt(0).toUpperCase() : '👤'}
+                      {profileImage ? (
+                        <img 
+                          src={profileImage} 
+                          alt="Profile" 
+                          style={styles.avatarImage}
+                        />
+                      ) : (
+                        getInitials(user?.name || '')
+                      )}
                     </div>
                     <div>
                       <div style={styles.dropdownName}>{user?.name || 'User'}</div>
@@ -364,6 +400,12 @@ const styles = {
     justifyContent: "center",
     fontSize: 16,
     fontWeight: "700",
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
   profileName: {
     maxWidth: 120,
@@ -403,6 +445,7 @@ const styles = {
     justifyContent: "center",
     fontSize: 20,
     fontWeight: "700",
+    overflow: "hidden",
   },
   dropdownName: {
     fontSize: 16,

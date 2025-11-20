@@ -37,9 +37,24 @@ const LoginPage = () => {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // Fetch user profile to get profileImage
+      try {
+        const profileRes = await fetch('http://localhost:5000/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${data.token}`
+          }
+        });
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          localStorage.setItem('profileImage', profileData.profileImage || '');
+        }
+      } catch (err) {
+        console.log('Could not fetch profile image');
+      }
+      
       navigate("/home");
     } catch (err) {
-      console.error("Login error:", err);
       setError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
     }
   };
@@ -47,35 +62,40 @@ const LoginPage = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        <h1 className={styles.title}>เข้าสู่ระบบ</h1>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <span style={{ fontSize: 48 }}>🏨</span>
+        </div>
+        <h1 className={styles.title}>ยินดีต้อนรับกลับ</h1>
 
-        {error && <div className={styles.errorMessage}>{error}</div>}
+        {error && <div className={styles.errorMessage}>⚠️ {error}</div>}
 
         <form onSubmit={handleLogin}>
           <input
             type="email"
-            placeholder="อีเมล"
+            placeholder="📧 อีเมล"
             className={styles.inputField}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
           />
           <input
             type="password"
-            placeholder="รหัสผ่าน"
+            placeholder="🔒 รหัสผ่าน"
             className={styles.inputField}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
           <button type="submit" className={styles.submitButton}>
-            เข้าสู่ระบบ
+            เข้าสู่ระบบ →
           </button>
         </form>
 
         <p className={styles.registerLink}>
           ยังไม่มีบัญชี?{" "}
-          <a href="/register" className={styles.link}>สมัครสมาชิก</a>
+          <a href="/register" className={styles.link}>สมัครสมาชิกเลย</a>
         </p>
       </div>
     </div>

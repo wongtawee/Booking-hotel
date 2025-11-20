@@ -55,28 +55,30 @@ const HomePage = () => {
 
   return (
     <div className={styles.container}>
-      {/* Hero Section */}
+      {/* Hero Section with Search */}
       <div className={styles.hero}>
-        <h1 className={styles.heroTitle}>ค้นหาที่พักในฝันของคุณ</h1>
-        <p className={styles.heroSubtitle}>
-          เลือกจากโรงแรมหลากหลายสไตล์ ราคาดีที่สุด พร้อมบริการตลอด 24 ชั่วโมง
-        </p>
-      </div>
-
-      {/* Search Section */}
-      <div className={styles.searchSection}>
-        <SearchBar
-          query={query}
-          onQueryChange={setQuery}
-          checkIn={checkIn}
-          checkOut={checkOut}
-          adults={adults}
-          children={children}
-          onCheckInChange={setCheckIn}
-          onCheckOutChange={setCheckOut}
-          onAdultsChange={setAdults}
-          onChildrenChange={setChildren}
-        />
+        <div className={styles.heroContent}>
+          <h1 className={styles.heroTitle}>ค้นหาที่พักในฝันของคุณ</h1>
+          <p className={styles.heroSubtitle}>
+            เลือกจากโรงแรมหลากหลายสไตล์ ราคาดีที่สุด พร้อมบริการตลอด 24 ชั่วโมง
+          </p>
+          
+          {/* Search Bar integrated in Hero */}
+          <div className={styles.searchWrapper}>
+            <SearchBar
+              query={query}
+              onQueryChange={setQuery}
+              checkIn={checkIn}
+              checkOut={checkOut}
+              adults={adults}
+              children={children}
+              onCheckInChange={setCheckIn}
+              onCheckOutChange={setCheckOut}
+              onAdultsChange={setAdults}
+              onChildrenChange={setChildren}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Content Section */}

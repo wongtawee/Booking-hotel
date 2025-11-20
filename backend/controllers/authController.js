@@ -68,16 +68,17 @@ exports.getMe = async (req, res) => {
       name: user.name,      
       email: user.email,
       address: user.address, 
-      phone: user.phone,    
+      phone: user.phone,
+      profileImage: user.profileImage,
+      createdAt: user.createdAt
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้' });
   }
 };
 
 exports.updateUser = async (req, res) => {
-  const { name, email, address, phone } = req.body;
+  const { name, email, address, phone, profileImage } = req.body;
 
   try {
     const user = await User.findById(req.user.id);
@@ -90,12 +91,18 @@ exports.updateUser = async (req, res) => {
     if (email) user.email = email;
     if (address) user.address = address;
     if (phone) user.phone = phone;
+    if (profileImage !== undefined) user.profileImage = profileImage;
 
     await user.save();
 
-    res.status(200).json({ message: 'ข้อมูลผู้ใช้ถูกอัปเดตแล้ว', user });
+    res.status(200).json({ 
+      message: 'ข้อมูลผู้ใช้ถูกอัปเดตแล้ว', 
+      name: user.name,
+      address: user.address,
+      phone: user.phone,
+      profileImage: user.profileImage
+    });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' });
   }
 };
