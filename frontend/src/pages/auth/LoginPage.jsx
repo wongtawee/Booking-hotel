@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./LoginPage.module.css";
-
-// URL ของ API Backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const API_URL = `${API_BASE_URL}/api/auth`;
+import { API_BASE_URL, API_ENDPOINTS } from "../../config/constants";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -82,7 +79,7 @@ const LoginPage = () => {
     setErrors({});
 
     try {
-      const res = await fetch(`${API_URL}/login`, {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.LOGIN}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -102,7 +99,7 @@ const LoginPage = () => {
       
       // Fetch user profile to get user data and profileImage
       try {
-        const profileRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const profileRes = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.ME}`, {
           headers: {
             'Authorization': `Bearer ${data.token}`
           }

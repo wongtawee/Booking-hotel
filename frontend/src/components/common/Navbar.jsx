@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { API_BASE_URL, API_ENDPOINTS } from "../../config/constants";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const Navbar = () => {
       if (!token) return;
 
       try {
-        const response = await fetch('http://localhost:5000/api/auth/me', {
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.ME}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

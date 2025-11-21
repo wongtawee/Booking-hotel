@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './Profile.module.css';
+import { API_BASE_URL, API_ENDPOINTS } from '../../config/constants';
 
 const Profile = () => {
   const [name, setName] = useState('');
@@ -43,7 +44,7 @@ const Profile = () => {
 
     // Fetch user profile
     axios
-      .get('http://localhost:5000/api/auth/me', {
+      .get(`${API_BASE_URL}${API_ENDPOINTS.AUTH.ME}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,7 +70,7 @@ const Profile = () => {
 
     // Fetch user bookings for stats
     axios
-      .get('http://localhost:5000/api/bookings/me', {
+      .get(`${API_BASE_URL}${API_ENDPOINTS.BOOKINGS.MY_BOOKINGS}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -156,7 +157,7 @@ const Profile = () => {
     setIsSaving(true);
     setError('');
     axios
-      .put('http://localhost:5000/api/auth/me', data, {
+      .put(`${API_BASE_URL}${API_ENDPOINTS.AUTH.UPDATE_PROFILE}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

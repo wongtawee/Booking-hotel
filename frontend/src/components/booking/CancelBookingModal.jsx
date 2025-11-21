@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styles from './CancelBookingModal.module.css';
 
-const CancelBookingModal = ({ isOpen, onClose, onConfirm, booking }) => {
+const CancelBookingModal = ({ booking, onConfirm, onCancel }) => {
   const [reason, setReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  if (!isOpen) return null;
+  if (!booking) return null;
 
   const handleConfirm = async () => {
     setIsProcessing(true);
@@ -16,12 +16,23 @@ const CancelBookingModal = ({ isOpen, onClose, onConfirm, booking }) => {
     }
   };
 
+  const getHotelImage = () => {
+    if (booking.hotelId?.images) {
+      if (Array.isArray(booking.hotelId.images) && booking.hotelId.images.length > 0) {
+        return booking.hotelId.images[0];
+      } else if (typeof booking.hotelId.images === 'string') {
+        return booking.hotelId.images;
+      }
+    }
+    return 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+  };
+
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.overlay} onClick={onCancel}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>⚠️ ยืนยันการยกเลิกการจอง</h2>
-          <button className={styles.closeButton} onClick={onClose}>
+          <button className={styles.closeButton} onClick={onCancel}>
             ✕
           </button>
         </div>
@@ -31,12 +42,12 @@ const CancelBookingModal = ({ isOpen, onClose, onConfirm, booking }) => {
           <div className={styles.bookingSummary}>
             <div className={styles.hotelImageWrapper}>
               <img 
-                src={booking.hotelId?.images?.[0] || 'https://via.placeholder.com/400x200?text=Hotel'} 
+                src={getHotelImage()} 
                 alt={booking.hotelId?.name}
                 className={styles.hotelImage}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/400x200?text=Hotel';
+                  e.target.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
                 }}
               />
             </div>
@@ -101,7 +112,7 @@ const CancelBookingModal = ({ isOpen, onClose, onConfirm, booking }) => {
         <div className={styles.footer}>
           <button 
             className={styles.cancelButton} 
-            onClick={onClose}
+            onClick={onCancel}
             disabled={isProcessing}
           >
             ไม่ยกเลิก

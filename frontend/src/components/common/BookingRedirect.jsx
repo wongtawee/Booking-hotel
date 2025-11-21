@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL, API_ENDPOINTS } from '../../config/constants';
 
 const BookingDetailsRedirect = () => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ useEffect(() => {
   const fetchBooking = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/bookings/me', {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BOOKINGS.MY_BOOKINGS}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

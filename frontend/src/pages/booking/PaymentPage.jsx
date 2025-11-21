@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './PaymentPage.module.css';
+import { API_BASE_URL, API_ENDPOINTS } from '../../config/constants';
 
 const PaymentPage = () => {
   const stripe = useStripe();
@@ -35,7 +36,7 @@ const PaymentPage = () => {
     const fetchClientSecret = async () => {
       try {
         const amountInCents = Math.round(amount * 100);
-        const res = await fetch('/api/payment/create-payment-intent', {
+        const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PAYMENT.CREATE_INTENT}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ const PaymentPage = () => {
       if (result.paymentIntent.status === 'succeeded') {
         // อัพเดท booking status เป็น paid
         try {
-          const confirmResponse = await fetch('/api/payment/confirm-payment', {
+          const confirmResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PAYMENT.CONFIRM_PAYMENT}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

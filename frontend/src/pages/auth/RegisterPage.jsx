@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./RegisterPage.module.css";
-
-// API URL ที่เชื่อมต่อกับ Backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const API_URL = `${API_BASE_URL}/api/auth`;
+import { API_BASE_URL, API_ENDPOINTS } from "../../config/constants";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -110,7 +107,7 @@ const RegisterPage = () => {
 
     try {
       // ส่งข้อมูลไปที่ Backend
-      const res = await fetch(`${API_URL}/register`, {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REGISTER}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -139,7 +136,7 @@ const RegisterPage = () => {
 
       // Fetch user profile to get user data
       try {
-        const profileRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const profileRes = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.ME}`, {
           headers: {
             'Authorization': `Bearer ${data.token}`
           }

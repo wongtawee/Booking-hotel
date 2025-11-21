@@ -1,48 +1,52 @@
 // API Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Stripe Configuration
 export const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY || '';
 
-// API Endpoints
+// API Endpoints (for direct fetch calls - includes /api prefix)
 export const API_ENDPOINTS = {
   // Auth
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    ME: '/auth/me',
-    UPDATE_PROFILE: '/auth/me'
+    LOGIN: '/api/auth/login',
+    REGISTER: '/api/auth/register',
+    ME: '/api/auth/me',
+    UPDATE_PROFILE: '/api/auth/me'
   },
   
   // Hotels
   HOTELS: {
-    BASE: '/hotels',
-    BY_ID: (id) => `/hotels/${id}`,
-    SEARCH: '/hotels/search'
+    BASE: '/api/hotels',
+    BY_ID: (id) => `/api/hotels/${id}`,
+    SEARCH: '/api/hotels/search'
   },
   
   // Rooms
   ROOMS: {
-    BASE: '/rooms',
-    BY_ID: (id) => `/rooms/${id}`,
-    BY_HOTEL: (hotelId) => `/hotels/${hotelId}/rooms`,
-    CHECK_AVAILABILITY: '/rooms/check-availability'
+    BASE: '/api/rooms',
+    BY_ID: (id) => `/api/rooms/${id}`,
+    BY_HOTEL: (hotelId) => `/api/hotels/${hotelId}/rooms`,
+    CHECK_AVAILABILITY: '/api/rooms/check-availability'
   },
   
   // Bookings
   BOOKINGS: {
-    BASE: '/bookings',
-    BY_ID: (id) => `/bookings/${id}`,
-    MY_BOOKINGS: '/bookings/me',
-    UPDATE_STATUS: (id) => `/bookings/${id}/status`,
-    CANCEL: (id) => `/bookings/${id}/cancel`
+    BASE: '/api/bookings',
+    BY_ID: (id) => `/api/bookings/${id}`,
+    MY_BOOKINGS: '/api/bookings/me',
+    UPDATE_STATUS: (id) => `/api/bookings/${id}/status`,
+    CANCEL: (id) => `/api/bookings/${id}/cancel`
   },
   
   // Payment
   PAYMENT: {
-    CREATE_INTENT: '/payment/create-payment-intent'
+    CREATE_INTENT: '/api/payment/create-payment-intent',
+    CONFIRM_PAYMENT: '/api/payment/confirm-payment'
   }
 };
+
+// Note: Service files using axios instance don't need /api prefix
+// because it's already included in the baseURL
 
 // App Configuration
 export const APP_CONFIG = {
