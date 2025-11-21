@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import styles from './CancelBookingModal.module.css';
 
-const CancelBookingModal = ({ booking, onConfirm, onCancel }) => {
+const CancelBookingModal = ({ booking, onConfirm, onCancel, isOpen, onClose }) => {
   const [reason, setReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  if (!booking) return null;
+  // Support both prop styles
+  const isModalOpen = isOpen !== undefined ? isOpen : !!booking;
+  const handleClose = onClose || onCancel;
+
+  if (!isModalOpen || !booking) return null;
 
   const handleConfirm = async () => {
     setIsProcessing(true);
@@ -28,11 +32,11 @@ const CancelBookingModal = ({ booking, onConfirm, onCancel }) => {
   };
 
   return (
-    <div className={styles.overlay} onClick={onCancel}>
+    <div className={styles.overlay} onClick={handleClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>⚠️ ยืนยันการยกเลิกการจอง</h2>
-          <button className={styles.closeButton} onClick={onCancel}>
+          <button className={styles.closeButton} onClick={handleClose}>
             ✕
           </button>
         </div>
@@ -112,7 +116,7 @@ const CancelBookingModal = ({ booking, onConfirm, onCancel }) => {
         <div className={styles.footer}>
           <button 
             className={styles.cancelButton} 
-            onClick={onCancel}
+            onClick={handleClose}
             disabled={isProcessing}
           >
             ไม่ยกเลิก
