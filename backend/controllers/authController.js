@@ -6,15 +6,72 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    // 1. ตรวจสอบข้อมูลครบถ้วน
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกอีเมลและรหัสผ่าน'
+      });
+    }
+
+    // 2. ตรวจสอบรูปแบบอีเมล
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    // Check for Thai or non-ASCII characters
+    if (/[ก-๙]/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'อีเมลต้องเป็นภาษาอังกฤษเท่านั้น'
+      });
+    }
+    
+    // Check for any non-ASCII characters
+    // eslint-disable-next-line no-control-regex
+    if (/[^\x00-\x7F]/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'อีเมลต้องเป็นตัวอักษรภาษาอังกฤษเท่านั้น'
+      });
+    }
+    
+    // Strict email format validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'รูปแบบอีเมลไม่ถูกต้อง (ใช้ a-z, 0-9, ., _, - เท่านั้น)'
+      });
+    }
+
+    // Check domain validity
+    const emailParts = trimmedEmail.split('@');
+    if (emailParts.length !== 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'รูปแบบอีเมลไม่ถูกต้อง'
+      });
+    }
+
+    const domain = emailParts[1];
+    const domainParts = domain.split('.');
+    if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'โดเมนอีเมลไม่ถูกต้อง'
+      });
+    }
+
+    // 3. ค้นหาผู้ใช้
+    const user = await User.findOne({ email: trimmedEmail });
 
     if (!user) {
       return res.status(400).json({ 
         success: false, 
-        message: 'ไม่พบผู้ใช้งานในระบบ' 
+        message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' 
       });
     }
 
+    // 4. ตรวจสอบรหัสผ่าน
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -24,6 +81,7 @@ exports.login = async (req, res) => {
       });
     }
 
+    // 5. สร้าง token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ 
@@ -31,6 +89,7 @@ exports.login = async (req, res) => {
       token 
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง' 
@@ -42,8 +101,104 @@ exports.register = async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
-    const userExists = await User.findOne({ email });
+    // 1. ตรวจสอบข้อมูลครบถ้วน
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
+      });
+    }
 
+    // 2. ตรวจสอบชื่อ
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร'
+      });
+    }
+    if (trimmedName.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: 'ชื่อต้องไม่เกิน 50 ตัวอักษร'
+      });
+    }
+
+    // 3. ตรวจสอบรูปแบบอีเมล
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    // Check for Thai or non-ASCII characters
+    if (/[ก-๙]/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'อีเมลต้องเป็นภาษาอังกฤษเท่านั้น'
+      });
+    }
+    
+    // Check for any non-ASCII characters
+    // eslint-disable-next-line no-control-regex
+    if (/[^\x00-\x7F]/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'อีเมลต้องเป็นตัวอักษรภาษาอังกฤษเท่านั้น'
+      });
+    }
+    
+    // Strict email format validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'รูปแบบอีเมลไม่ถูกต้อง (ใช้ a-z, 0-9, ., _, - เท่านั้น)'
+      });
+    }
+
+    // Check domain validity
+    const emailParts = trimmedEmail.split('@');
+    if (emailParts.length !== 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'รูปแบบอีเมลไม่ถูกต้อง'
+      });
+    }
+
+    const domain = emailParts[1];
+    const domainParts = domain.split('.');
+    if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'โดเมนอีเมลไม่ถูกต้อง'
+      });
+    }
+
+    // 4. ตรวจสอบรหัสผ่าน
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'
+      });
+    }
+    if (password.length > 128) {
+      return res.status(400).json({
+        success: false,
+        message: 'รหัสผ่านต้องไม่เกิน 128 ตัวอักษร'
+      });
+    }
+    if (!/(?=.*[0-9])/.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว'
+      });
+    }
+    if (!/(?=.*[a-zA-Z])/.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'รหัสผ่านต้องมีตัวอักษรอย่างน้อย 1 ตัว'
+      });
+    }
+
+    // 5. ตรวจสอบอีเมลซ้ำ
+    const userExists = await User.findOne({ email: trimmedEmail });
     if (userExists) {
       return res.status(400).json({ 
         success: false, 
@@ -51,12 +206,13 @@ exports.register = async (req, res) => {
       });
     }
 
+    // 6. สร้างผู้ใช้ใหม่
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      email,
+      email: trimmedEmail,
       password: hashedPassword,
-      name,
+      name: trimmedName,
     });
 
     await newUser.save();
@@ -68,6 +224,7 @@ exports.register = async (req, res) => {
       token 
     });
   } catch (error) {
+    console.error('Register error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง' 

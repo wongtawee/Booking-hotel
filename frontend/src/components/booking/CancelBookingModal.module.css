@@ -1,0 +1,304 @@
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal */
+.modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2d3748;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #718096;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: #f7fafc;
+  color: #2d3748;
+}
+
+/* Content */
+.content {
+  padding: 24px;
+}
+
+/* Booking Summary */
+.bookingSummary {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  border: 2px solid #e2e8f0;
+}
+
+.hotelImageWrapper {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.hotelImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.summaryDetails {
+  padding: 16px;
+}
+
+.hotelName {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+}
+
+.icon {
+  font-size: 16px;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.value {
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+/* Reason Section */
+.reasonSection {
+  margin-bottom: 24px;
+}
+
+.reasonLabel {
+  display: block;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.reasonInput {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  transition: border-color 0.2s ease;
+}
+
+.reasonInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.charCount {
+  text-align: right;
+  font-size: 12px;
+  color: #a0aec0;
+  margin-top: 4px;
+}
+
+/* Warning Box */
+.warningBox {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  margin-bottom: 0;
+}
+
+.warningIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.warningText {
+  font-size: 13px;
+  color: #742a2a;
+  line-height: 1.5;
+}
+
+.warningText strong {
+  font-weight: 700;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  gap: 12px;
+  padding: 24px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.cancelButton,
+.confirmButton {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cancelButton {
+  background: #f7fafc;
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.confirmButton {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+.confirmButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
+}
+
+.cancelButton:disabled,
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .header {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .footer {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .cancelButton,
+  .confirmButton {
+    width: 100%;
+  }
+}

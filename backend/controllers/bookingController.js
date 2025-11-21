@@ -1,84 +1,312 @@
-const Booking = require('../models/booking');
+const Booking = require('../models/Booking');
+const Room = require('../models/Room');
+const AppError = require('../utils/AppError');
 
-const createBooking = async (req, res) => {
+const createBooking = async (req, res, next) => {
   try {
+    const { roomId, checkIn, checkOut, hotelId, name, email, phone, guests, totalPrice } = req.body;
+
+    // Validate roomId is provided
+    if (!roomId) {
+      return next(new AppError('Room ID is required', 400));
+    }
+
+    // Check if room exists
+    const room = await Room.findById(roomId);
+    if (!room) {
+      return next(new AppError('Room not found', 404));
+    }
+
+    // Check if room is available for the requested dates
+    if (!room.isAvailableForDates(checkIn, checkOut)) {
+      return next(new AppError('Room is not available for the selected dates', 400));
+    }
+
+    // Create booking
     const newBooking = new Booking({
       userId: req.user.id,
-      hotelId: req.body.hotelId,
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      checkIn: req.body.checkIn,
-      checkOut: req.body.checkOut,
-      guests: req.body.guests,
-      totalPrice: req.body.totalPrice
+      hotelId: hotelId || room.hotelId,
+      roomId,
+      name,
+      email,
+      phone,
+      checkIn,
+      checkOut,
+      guests,
+      totalPrice,
+      status: 'pending'
     });
 
     const savedBooking = await newBooking.save();
-    res.status(201).json(savedBooking);
+
+    // Add booking dates to room's bookedDates array
+    room.bookedDates.push({
+      checkIn: new Date(checkIn),
+      checkOut: new Date(checkOut),
+      bookingId: savedBooking._id
+    });
+    await room.save();
+
+    res.status(201).json({
+      success: true,
+      data: savedBooking
+    });
   } catch (error) {
-    res.status(500).json({ message: 'ไม่สามารถสร้างการจองได้' });
+    next(error);
   }
 };
 
-const getMyBookings = async (req, res) => {
+const getMyBookings = async (req, res, next) => {
   try {
-    const bookings = await Booking.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    res.json(bookings);
+    const bookings = await Booking.find({ userId: req.user.id })
+      .populate('roomId', 'roomType pricePerNight')
+      .populate('hotelId', 'name location')
+      .sort({ createdAt: -1 });
+    
+    // Add countdown timer data for pending bookings
+    const bookingsWithTimer = bookings.map(booking => {
+      const bookingObj = booking.toObject();
+      
+      if (booking.status === 'pending' && booking.expiresAt) {
+        const now = new Date();
+        const expiresAt = new Date(booking.expiresAt);
+        const remainingMs = expiresAt - now;
+        
+        bookingObj.remainingTime = {
+          milliseconds: Math.max(0, remainingMs),
+          minutes: Math.max(0, Math.floor(remainingMs / 60000)),
+          seconds: Math.max(0, Math.floor((remainingMs % 60000) / 1000)),
+          expired: remainingMs <= 0
+        };
+      }
+      
+      return bookingObj;
+    });
+    
+    res.json({
+      success: true,
+      data: bookingsWithTimer
+    });
   } catch (error) {
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลการจองของคุณ' });
+    next(error);
   }
 };
 
-const getBookingById = async (req, res) => {
+const getBookingById = async (req, res, next) => {
   try {
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ message: 'ไม่พบข้อมูลการจอง' });
-
-    if (booking.userId !== req.user.id) {
-      return res.status(403).json({ message: 'คุณไม่มีสิทธิ์เข้าถึงการจองนี้' });
+    const booking = await Booking.findById(req.params.id)
+      .populate('roomId', 'roomType pricePerNight capacity amenities images')
+      .populate('hotelId', 'name location rating images');
+    
+    if (!booking) {
+      return next(new AppError('Booking not found', 404));
     }
 
-    res.json(booking);
+    // Check permission - req.user.id is a string from JWT
+    if (booking.userId.toString() !== req.user.id) {
+      return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลการจองนี้', 403));
+    }
+
+    // Add countdown timer data for pending bookings
+    const bookingObj = booking.toObject();
+    
+    if (booking.status === 'pending' && booking.expiresAt) {
+      const now = new Date();
+      const expiresAt = new Date(booking.expiresAt);
+      const remainingMs = expiresAt - now;
+      
+      bookingObj.remainingTime = {
+        milliseconds: Math.max(0, remainingMs),
+        minutes: Math.max(0, Math.floor(remainingMs / 60000)),
+        seconds: Math.max(0, Math.floor((remainingMs % 60000) / 1000)),
+        expired: remainingMs <= 0
+      };
+    }
+
+    res.json({
+      success: true,
+      data: bookingObj
+    });
   } catch (error) {
-    res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
+    next(error);
   }
 };
 
-const updateBooking = async (req, res) => {
+const updateBooking = async (req, res, next) => {
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ message: 'ไม่พบการจอง' });
+    if (!booking) {
+      return next(new AppError('Booking not found', 404));
+    }
 
-    if (booking.userId !== req.user.id) {
-      return res.status(403).json({ message: 'ไม่ได้รับอนุญาต' });
+    // Check permission - req.user.id is a string from JWT
+    if (booking.userId.toString() !== req.user.id) {
+      return next(new AppError('คุณไม่มีสิทธิ์แก้ไขการจองนี้', 403));
+    }
+
+    // Prevent updating cancelled bookings
+    if (booking.status === 'cancelled') {
+      return next(new AppError('Cannot update a cancelled booking', 400));
     }
 
     const updated = await Booking.findByIdAndUpdate(
       req.params.id,
       { ...req.body },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
-    res.json(updated);
+    res.json({
+      success: true,
+      data: updated
+    });
   } catch (error) {
-    res.status(500).json({ message: 'ไม่สามารถอัปเดตการจองได้' });
+    next(error);
   }
 };
 
-const deleteBooking = async (req, res) => {
+const deleteBooking = async (req, res, next) => {
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ message: 'ไม่พบการจอง' });
+    if (!booking) {
+      return next(new AppError('Booking not found', 404));
+    }
 
-    if (booking.userId !== req.user.id) {
-      return res.status(403).json({ message: 'ไม่ได้รับอนุญาต' });
+    // Check permission - req.user.id is a string from JWT
+    if (booking.userId.toString() !== req.user.id) {
+      return next(new AppError('คุณไม่มีสิทธิ์ลบการจองนี้', 403));
+    }
+
+    // Remove booking dates from room
+    if (booking.roomId) {
+      const room = await Room.findById(booking.roomId);
+      if (room) {
+        // Use .equals() for ObjectId comparison (MongoDB best practice)
+        room.bookedDates = room.bookedDates.filter(
+          date => !date.bookingId.equals(booking._id)
+        );
+        await room.save();
+      }
     }
 
     await booking.deleteOne();
-    res.json({ message: 'ลบการจองเรียบร้อยแล้ว' });
+    res.json({
+      success: true,
+      message: 'Booking deleted successfully'
+    });
   } catch (error) {
-    res.status(500).json({ message: 'ไม่สามารถลบการจองได้' });
+    next(error);
+  }
+};
+
+// Update booking status (admin or payment webhook)
+const updateBookingStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return next(new AppError('Booking not found', 404));
+    }
+
+    // Validate status
+    if (!['pending', 'paid', 'cancelled'].includes(status)) {
+      return next(new AppError('Invalid status', 400));
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    res.json({
+      success: true,
+      data: booking
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Cancel booking
+const cancelBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return next(new AppError('Booking not found', 404));
+    }
+
+    // Use .equals() for ObjectId comparison (MongoDB best practice)
+    // Check permission - allow user to cancel their own booking or admin to cancel any booking
+    // Note: req.user.id is a string from JWT, so we compare with toString()
+    if (booking.userId.toString() !== req.user.id && req.user.role !== 'admin') {
+      return next(new AppError('คุณไม่มีสิทธิ์ยกเลิกการจองนี้', 403));
+    }
+
+    // Check if already cancelled
+    if (booking.status === 'cancelled') {
+      return next(new AppError('Booking is already cancelled', 400));
+    }
+
+    // Update booking status with cancellation details
+    booking.status = 'cancelled';
+    booking.cancelledAt = new Date();
+    if (req.body.reason) {
+      booking.cancellationReason = req.body.reason;
+    }
+    await booking.save();
+
+    // Remove booking dates from room
+    if (booking.roomId) {
+      const room = await Room.findById(booking.roomId);
+      if (room) {
+        // Use .equals() for ObjectId comparison (MongoDB best practice)
+        room.bookedDates = room.bookedDates.filter(
+          date => !date.bookingId.equals(booking._id)
+        );
+        await room.save();
+      }
+    }
+
+    res.json({
+      success: true,
+      data: booking,
+      message: 'Booking cancelled successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all bookings (admin only)
+const getAllBookings = async (req, res, next) => {
+  try {
+    const { status, page = 1, limit = 10 } = req.query;
+    const query = {};
+
+    if (status) {
+      query.status = status;
+    }
+
+    const bookings = await Booking.find(query)
+      .populate('userId', 'name email')
+      .populate('roomId', 'roomType pricePerNight')
+      .populate('hotelId', 'name location')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const count = await Booking.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: bookings,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        pages: Math.ceil(count / limit)
+      }
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -87,5 +315,8 @@ module.exports = {
   getMyBookings,
   getBookingById,
   updateBooking,
-  deleteBooking
+  deleteBooking,
+  updateBookingStatus,
+  cancelBooking,
+  getAllBookings
 };
