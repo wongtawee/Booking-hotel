@@ -9,20 +9,32 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'ไม่พบผู้ใช้งานในระบบ' 
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' 
+      });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ token });
+    res.json({ 
+      success: true, 
+      token 
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง' 
+    });
   }
 };
 
@@ -33,7 +45,10 @@ exports.register = async (req, res) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'อีเมลนี้มีอยู่ในระบบแล้ว' 
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,9 +63,15 @@ exports.register = async (req, res) => {
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).json({ token });
+    res.status(201).json({ 
+      success: true, 
+      token 
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองใหม่อีกครั้ง' 
+    });
   }
 };
 
@@ -59,21 +80,30 @@ exports.getMe = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ message: 'ไม่พบข้อมูลผู้ใช้' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'ไม่พบข้อมูลผู้ใช้' 
+      });
     }
 
     // ส่งข้อมูลผู้ใช้ที่ค้นหามา
     res.status(200).json({
-      userId: user._id,   
-      name: user.name,      
-      email: user.email,
-      address: user.address, 
-      phone: user.phone,
-      profileImage: user.profileImage,
-      createdAt: user.createdAt
+      success: true,
+      data: {
+        userId: user._id,   
+        name: user.name,      
+        email: user.email,
+        address: user.address, 
+        phone: user.phone,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้' 
+    });
   }
 };
 
@@ -84,7 +114,10 @@ exports.updateUser = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ message: 'ไม่พบผู้ใช้' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'ไม่พบผู้ใช้' 
+      });
     }
 
     if (name) user.name = name;
@@ -96,13 +129,19 @@ exports.updateUser = async (req, res) => {
     await user.save();
 
     res.status(200).json({ 
-      message: 'ข้อมูลผู้ใช้ถูกอัปเดตแล้ว', 
-      name: user.name,
-      address: user.address,
-      phone: user.phone,
-      profileImage: user.profileImage
+      success: true,
+      message: 'ข้อมูลผู้ใช้ถูกอัปเดตแล้ว',
+      data: {
+        name: user.name,
+        address: user.address,
+        phone: user.phone,
+        profileImage: user.profileImage
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' 
+    });
   }
 };

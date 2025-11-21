@@ -1,95 +1,158 @@
+/* LoginPage Styles */
 .wrapper {
-  background-color: #f3f4f6;
-  padding: 40px 20px;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .container {
-  display: flex;
-  flex-direction: column;
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
-  max-width: 400px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  text-align: center;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .title {
-  font-size: 2rem;
-  color: #333333;
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-.errorMessage {
-  color: #f44336;
-  font-size: 14px;
-  margin-bottom: 16px;
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 32px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .inputField {
-  padding: 12px;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 16px;
   width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
   box-sizing: border-box;
+  font-family: inherit;
+}
+
+.inputField:focus {
   outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.inputField::placeholder {
+  color: #a0aec0;
 }
 
 .submitButton {
   width: 100%;
-  padding: 14px;
-  background-color: #f6c90e;
-  color: #fff;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  margin-top: 8px;
 }
 
 .submitButton:hover {
-  background-color: #e0b700;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+.errorMessage {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
 }
 
 .registerLink {
   text-align: center;
-  font-size: 14px;
-  color: #777;
-  margin-top: 20px;
+  margin-top: 24px;
+  color: #4a5568;
+  font-size: 15px;
 }
 
 .link {
-  color: #007bff;
-  text-decoration: underline;
-  font-weight: 600;
+  color: #667eea;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
-/* ✅ Responsive สำหรับมือถือ */
-@media screen and (max-width: 480px) {
+.link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   .container {
-    padding: 20px 16px;
+    padding: 36px 28px;
   }
 
   .title {
-    font-size: 1.6rem;
-  }
-
-  .submitButton {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .inputField {
-    font-size: 15px;
-    padding: 10px;
+    font-size: 28px;
   }
 }

@@ -32,13 +32,12 @@ const LoginPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        return setError(data.msg || "เข้าสู่ระบบไม่สำเร็จ");
+        return setError(data.message || data.msg || "เข้าสู่ระบบไม่สำเร็จ");
       }
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
       
-      // Fetch user profile to get profileImage
+      // Fetch user profile to get user data and profileImage
       try {
         const profileRes = await fetch('http://localhost:5000/api/auth/me', {
           headers: {
@@ -47,10 +46,17 @@ const LoginPage = () => {
         });
         if (profileRes.ok) {
           const profileData = await profileRes.json();
-          localStorage.setItem('profileImage', profileData.profileImage || '');
+          // Backend returns { success: true, data: {...} }
+          const userData = profileData.data || profileData;
+          localStorage.setItem('user', JSON.stringify({
+            name: userData.name,
+            email: userData.email,
+            userId: userData.userId
+          }));
+          localStorage.setItem('profileImage', userData.profileImage || '');
         }
       } catch (err) {
-        console.log('Could not fetch profile image');
+        console.log('Could not fetch profile');
       }
       
       navigate("/home");

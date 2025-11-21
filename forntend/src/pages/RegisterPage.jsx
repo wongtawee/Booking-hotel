@@ -39,7 +39,6 @@ const RegisterPage = () => {
       // นำทางไปหน้า Profile หลังจากสมัครสมาชิกสำเร็จ
       navigate("/home");
     } catch (err) {
-      console.error("Registration error:", err);
       setError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
     }
   };
@@ -47,42 +46,47 @@ const RegisterPage = () => {
    return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        <h1 className={styles.title}>สมัครสมาชิก</h1>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <span style={{ fontSize: 48 }}>✨</span>
+        </div>
+        <h1 className={styles.title}>สร้างบัญชีใหม่</h1>
 
-        {error && <div className={styles.errorMessage}>{error}</div>}
+        {error && <div className={styles.errorMessage}>⚠️ {error}</div>}
 
-        {/* แบบฟอร์มสำหรับการลงทะเบียน */}
         <form onSubmit={handleRegister}>
           <input
             type="text"
-            placeholder="ชื่อ"
+            placeholder="👤 ชื่อ-นามสกุล"
             className={styles.inputField}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            autoComplete="name"
           />
           <input
             type="email"
-            placeholder="อีเมล"
+            placeholder="📧 อีเมล"
             className={styles.inputField}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
           />
           <input
             type="password"
-            placeholder="รหัสผ่าน"
+            placeholder="🔒 รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
             className={styles.inputField}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength="6"
+            autoComplete="new-password"
           />
           <button type="submit" className={styles.submitButton}>
-            สมัครสมาชิก
+            สมัครสมาชิก →
           </button>
         </form>
 
-        {/* ลิงก์ไปหน้าล็อคอินถ้ามีบัญชีแล้ว */}
         <p className={styles.loginLink}>
           มีบัญชีอยู่แล้ว?{" "}
           <a href="/login" className={styles.link}>
