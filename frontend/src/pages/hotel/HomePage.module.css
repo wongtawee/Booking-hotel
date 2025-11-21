@@ -68,32 +68,90 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  padding: 32px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.sectionHeader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
 .sectionTitle {
-  font-size: 32px;
-  font-weight: 700;
-  color: #2d3748;
+  font-size: 36px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sectionTitle::before {
+  content: '🏨';
+  font-size: 32px;
+  -webkit-text-fill-color: initial;
 }
 
 .viewAllButton {
-  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.viewAllButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.viewAllButton:hover::before {
+  left: 100%;
 }
 
 .viewAllButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.6);
+}
+
+.viewAllButton::after {
+  content: '→';
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.viewAllButton:hover::after {
+  transform: translateX(4px);
 }
 
 .hotelList {
@@ -247,8 +305,25 @@
     margin-top: 32px;
   }
 
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px;
+  }
+
   .sectionTitle {
-    font-size: 24px;
+    font-size: 28px;
+  }
+
+  .sectionTitle::before {
+    font-size: 28px;
+  }
+
+  .viewAllButton {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 24px;
   }
 
   .hotelList {
@@ -256,11 +331,7 @@
     gap: 24px;
   }
 
-  .sectionHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
+
 
   .pagination {
     flex-direction: column;
